@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Investment Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .progress-bar {
+            width: 100%;
+            background: #ddd;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .progress {
+            height: 20px;
+            width: 0%;
+            background: green;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+        }
+        input, button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .investor-list {
+            text-align: left;
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .investor-list h3 {
+            margin: 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #ddd;
+        }
+        .investor-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .investor-list li {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+        .withdraw-btn {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Invest in This Property</h2>
+        <img src="https://source.unsplash.com/600x300/?house" alt="Property Image">
+        <h3>Fix & Flip Opportunity - $250,000</h3>
+        <p><strong>Asking Price:</strong> $200,000</p>
+        <p><strong>Estimated Repair Cost:</strong> $50,000</p>
+        <p><strong>After Repair Value (ARV):</strong> $300,000</p>
+        <p><strong>Minimum Investment:</strong> $1,000</p>
+
+        <div class="progress-bar">
+            <div class="progress" id="progress">0%</div>
+        </div>
+        <p><strong>Total Raised: $<span id="raised">0</span> / $50,000</strong></p>
+
+        <input type="text" id="username" placeholder="Enter your name">
+        <input type="number" id="investment" placeholder="Enter amount to invest">
+        <button onclick="invest()">Invest Now</button>
+
+        <p id="message" style="color: green; font-weight: bold;"></p>
+
+        <div class="investor-list">
+            <h3>Investor Contributions</h3>
+            <ul id="investor-list"></ul>
+        </div>
+    </div>
+
+    <script>
+        let totalInvestment = 0;
+        const requiredInvestment = 50000;
+        let investors = [];
+
+        function invest() {
+            let username = document.getElementById("username").value.trim();
+            let amount = parseInt(document.getElementById("investment").value);
+
+            if (!username) {
+                document.getElementById("message").innerText = "Enter your name to invest.";
+                return;
+            }
+
+            if (!amount || amount < 1000) {
+                document.getElementById("message").innerText = "Minimum investment is $1,000.";
+                return;
+            }
+
+            if (totalInvestment + amount > requiredInvestment) {
+                document.getElementById("message").innerText = "Investment exceeds required amount!";
+                return;
+            }
+
+            totalInvestment += amount;
+            investors.push({ name: username, amount: amount });
+
+            updateUI();
+            document.getElementById("message").innerText = "Investment successful!";
+        }
+
+        function updateUI() {
+            let percentage = (totalInvestment / requiredInvestment) * 100;
+            document.getElementById("progress").style.width = percentage + "%";
+            document.getElementById("progress").innerText = Math.floor(percentage) + "%";
+            document.getElementById("raised").innerText = totalInvestment;
+
+            let investorList = document.getElementById("investor-list");
+            investorList.innerHTML = "";
+            investors.forEach((investor, index) => {
+                let li = document.createElement("li");
+                li.innerHTML = `<strong>${investor.name}</strong> invested $${investor.amount} 
+                    <button class="withdraw-btn" onclick="withdraw(${index})">Withdraw</button>`;
+                investorList.appendChild(li);
+            });
+        }
+
+        function withdraw(index) {
+            let fee = 100; // Small withdrawal fee
+            let withdrawnAmount = investors[index].amount - fee;
+
+            totalInvestment -= investors[index].amount;
+            investors.splice(index, 1);
+            updateUI();
+
+            document.getElementById("message").innerText = `You withdrew $${withdrawnAmount} (after $${fee} fee).`;
+        }
+    </script>
+
+</body>
+</html>
